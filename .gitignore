@@ -1,5 +1,18 @@
-./contextoDoProjeto.md
-.tfstate
-.terraform
+# Arquivos para instrução e contexto da IA.
+contextoDoProjeto.md
+
+# Terraform.
+*.tfstate*
+*.tfvars
+.terraform/
+
+# Node.
+node_modules/
+
+# Secrets.
 .env
+.env.*
+!.env.example
 *.pem
+
+# Credenciais da AWS.
