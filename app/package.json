@@ -1,0 +1,20 @@
+{
+  "name": "api-reservas",
+  "version": "1.0.0",
+  "description": "API de Reservas da TechNova (Node.js/Express + PostgreSQL)",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  }
+}

@@ -1,0 +1,61 @@
+# =============================================================================
+# .dockerignore da API de Reservas
+# -----------------------------------------------------------------------------
+# Quando você roda "docker build", o Docker empacota a pasta do contexto
+# (aqui, app/) e envia esse pacote para o builder. Este arquivo define o que
+# fica DE FORA desse pacote.
+#
+# Estratégia adotada: LISTA DE PERMISSÕES (allowlist)
+#   1. Ignorar TUDO.
+#   2. Liberar explicitamente só o que a imagem precisa.
+#
+# Por que não o contrário (listar só o que ignorar)? Porque, numa lista de
+# bloqueio, qualquer arquivo novo que ninguém lembrou de listar (um backup
+# do banco, uma chave, um .env com outro nome) entra no build sem ninguém
+# perceber. Na lista de permissões, um arquivo novo fica de fora até alguém
+# liberá-lo de propósito, então o padrão é seguro.
+#
+# As regras são lidas de cima para baixo, e a ÚLTIMA regra que casa com um
+# arquivo é a que vale. O "!" significa "NÃO ignorar" (liberar).
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Ignora tudo por padrão
+# -----------------------------------------------------------------------------
+*
+
+# -----------------------------------------------------------------------------
+# 2. Libera apenas o que o Dockerfile copia
+# -----------------------------------------------------------------------------
+# Arquivos de dependências (usados pelo "npm ci").
+!package.json
+!package-lock.json
+
+# Código-fonte da aplicação.
+!src/
+
+# Obs.: o próprio Dockerfile não precisa ser liberado aqui; o Docker o lê
+# separadamente do contexto de build.
+
+# -----------------------------------------------------------------------------
+# 3. Proteção extra DENTRO das pastas liberadas (defesa em profundidade)
+# -----------------------------------------------------------------------------
+# Mesmo dentro de src/, estes arquivos nunca devem entrar na imagem. Como a
+# última regra que casa é a que vale, estas linhas vencem o "!src/" acima.
+# O "**/" significa "em qualquer nível de subpasta".
+
+# Arquivos de variáveis de ambiente (podem conter senhas).
+**/.env
+**/.env.*
+
+# Chaves e certificados.
+**/*.pem
+**/*.key
+
+# Dependências instaladas localmente: a imagem instala as dela com "npm ci".
+# Copiar a node_modules do seu computador poderia trazer binários compilados
+# para outro sistema operacional e versões diferentes das do lock.
+**/node_modules
+
+# Logs gerados pelo npm em caso de erro.
+**/npm-debug.log*
