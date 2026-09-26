@@ -15,6 +15,12 @@
 # Valores reaproveitados por todos os módulos.
 locals {
   nome_projeto = "api-reservas"
+
+  # Nome do banco e usuário: definidos UMA vez aqui e passados tanto ao
+  # módulo rds (que os cria) quanto ao módulo ec2 (que os entrega à API).
+  # Assim os dois lados nunca ficam com valores diferentes.
+  db_nome    = "reservas"
+  db_usuario = "reservas_app"
 }
 
 # -----------------------------------------------------------------------------
@@ -40,4 +46,20 @@ module "security_group" {
   vpc_id    = module.vpc.vpc_id
   cidr_ssh  = var.cidr_ssh
   cidr_http = var.cidr_http
+}
+
+# -----------------------------------------------------------------------------
+# Banco de dados (T-08)
+# -----------------------------------------------------------------------------
+# Recebe as sub-redes privadas do módulo vpc e o SG do módulo
+# security-group. A senha vem de uma variável sensitive (terraform.tfvars).
+module "rds" {
+  source = "./modules/rds"
+
+  nome                  = local.nome_projeto
+  ids_subredes_privadas = module.vpc.ids_subredes_privadas
+  id_sg_rds             = module.security_group.id_sg_rds
+  nome_banco            = local.db_nome
+  usuario               = local.db_usuario
+  senha                 = var.db_senha
 }

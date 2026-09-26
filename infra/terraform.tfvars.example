@@ -16,3 +16,7 @@ cidr_ssh = "<SEU_IP>/32"
 # Opcional: quem pode acessar a API na porta 80. Padrão: a internet toda.
 # Para restringir aos seus testes, descomente e use o seu IP.
 # cidr_http = "<SEU_IP>/32"
+
+# Senha do usuário principal do RDS (T-08). Gere uma senha aleatória, com no
+# mínimo 16 caracteres e SEM /, @, aspas duplas ou espaços (restrição do RDS).
+db_senha = "<SENHA_FORTE>"

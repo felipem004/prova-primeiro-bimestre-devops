@@ -90,7 +90,7 @@
   da EC2. **Teste negativo:** com `cidr_ssh = "0.0.0.0/0"`, o `plan` falha
   com a mensagem da validação.
 
-### [ ] T-08: Módulo `rds`
+### [x] T-08: Módulo `rds`
 - **O quê:** DB subnet group + instância PostgreSQL 17 com os argumentos do
   design.
 - **Atende:** RF-05 (CA-05.1 a 05.4), CA-C.1 · design §6.3
