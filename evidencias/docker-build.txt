@@ -1,0 +1,57 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 5.75kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:24-alpine
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2.72kB done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 71.22kB done
+#4 DONE 0.1s
+
+#5 [1/5] FROM docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+#5 resolve docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 0.0s done
+#5 DONE 0.1s
+
+#6 [2/5] WORKDIR /app
+#6 DONE 0.1s
+
+#7 [3/5] COPY package.json package-lock.json ./
+#7 DONE 0.2s
+
+#8 [4/5] RUN npm ci --omit=dev && npm cache clean --force
+#8 1.030 
+#8 1.030 added 82 packages, and audited 83 packages in 785ms
+#8 1.030 
+#8 1.030 28 packages are looking for funding
+#8 1.030   run `npm fund` for details
+#8 1.031 
+#8 1.031 found 0 vulnerabilities
+#8 1.032 npm notice
+#8 1.032 npm notice New major version of npm available! 11.19.0 -> 12.1.0
+#8 1.032 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.1.0
+#8 1.032 npm notice To update run: npm install -g npm@12.1.0
+#8 1.032 npm notice
+#8 1.166 npm warn using --force Recommended protections disabled.
+#8 DONE 1.5s
+
+#9 [5/5] COPY src/ ./src/
+#9 DONE 0.1s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 0.5s done
+#10 exporting manifest sha256:05ad1db0e7ff270f03191d4c836c342bfd0fa2a9048255bccf8c022accad4e5d 0.0s done
+#10 exporting config sha256:ba76c66e73d3d2e074c7173ffde4359155ce8b211926996ffa0d717809b0905e 0.0s done
+#10 exporting attestation manifest sha256:e4df6717255b9c2b2193107685200aa9e57d2833ad663490c82d61951ec9510f 0.0s done
+#10 exporting manifest list sha256:f74d66905da594b4b9fab301bdd126cda00a79b7a70eb28a918a3be2c9dbd2fe 0.0s done
+#10 naming to docker.io/library/api-reservas:dev done
+#10 unpacking to docker.io/library/api-reservas:dev
+#10 unpacking to docker.io/library/api-reservas:dev 0.2s done
+#10 DONE 0.8s
