@@ -27,3 +27,17 @@ module "vpc" {
 
   nome = local.nome_projeto
 }
+
+# -----------------------------------------------------------------------------
+# Firewalls (T-07)
+# -----------------------------------------------------------------------------
+# module.vpc.vpc_id é a SAÍDA do módulo vpc usada como ENTRADA deste. Essa
+# referência é o que diz ao Terraform: "crie a VPC antes dos SGs".
+module "security_group" {
+  source = "./modules/security-group"
+
+  nome      = local.nome_projeto
+  vpc_id    = module.vpc.vpc_id
+  cidr_ssh  = var.cidr_ssh
+  cidr_http = var.cidr_http
+}

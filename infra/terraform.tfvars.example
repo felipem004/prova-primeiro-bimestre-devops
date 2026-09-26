@@ -1,0 +1,18 @@
+# =============================================================================
+# terraform.tfvars.example: MODELO dos valores das variáveis do projeto
+# -----------------------------------------------------------------------------
+# Este arquivo VAI para o Git. O arquivo real, terraform.tfvars, é ignorado
+# pelo Git (regra *.tfvars), porque contém dados pessoais (seu IP) e, a partir
+# da T-10, a senha do banco.
+#
+# O Terraform carrega o terraform.tfvars AUTOMATICAMENTE em todo plan/apply
+# feito nesta pasta; não é preciso informá-lo no comando.
+# =============================================================================
+
+# Seu IP público com /32 (T-03). Único IP autorizado no SSH da EC2.
+# Descubra com: curl -s https://checkip.amazonaws.com
+cidr_ssh = "<SEU_IP>/32"
+
+# Opcional: quem pode acessar a API na porta 80. Padrão: a internet toda.
+# Para restringir aos seus testes, descomente e use o seu IP.
+# cidr_http = "<SEU_IP>/32"

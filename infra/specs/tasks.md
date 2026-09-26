@@ -73,16 +73,18 @@
     Q-04). → **Risco d) do design.**
   - Nenhum `terraform.tfstate` local é criado em `infra/`.
 
-### [ ] T-06: Módulo `vpc` + ligação no `main.tf`
+### [x] T-06: Módulo `vpc` + ligação no `main.tf`
 - **O quê:** módulo completo (VPC, IGW, sub-rede pública + rotas, 2 sub-redes
   privadas em AZs diferentes) e a primeira chamada `module "vpc"` na raiz.
 - **Atende:** RF-02 (CA-02.1 a 02.3), CA-06.1 · design §6.1
 - **Verificar:** `terraform validate` e `terraform plan`: 2 sub-redes privadas
   em AZs diferentes, sem rota `0.0.0.0/0` nelas.
 
-### [ ] T-07: Módulo `security-group`
+### [x] T-07: Módulo `security-group`
 - **O quê:** SGs `ec2` e `rds`, regras como recursos separados e validação que
-  rejeita `0.0.0.0/0` no SSH.
+  rejeita `0.0.0.0/0` no SSH. Como o `cidr_ssh` é a primeira variável
+  obrigatória, o `terraform.tfvars.example` e o `terraform.tfvars` local são
+  criados aqui (antecipados da T-10, que os completa).
 - **Atende:** RF-03 (CA-03.1, CA-03.2), CA-S.4 · design §6.2
 - **Verificar:** `terraform plan` mostra a 5432 liberada **só** a partir do SG
   da EC2. **Teste negativo:** com `cidr_ssh = "0.0.0.0/0"`, o `plan` falha
