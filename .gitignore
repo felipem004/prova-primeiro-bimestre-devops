@@ -1,0 +1,5 @@
+./contextoDoProjeto.md
+.tfstate
+.terraform
+.env
+*.pem
