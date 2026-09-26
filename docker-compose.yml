@@ -1,0 +1,206 @@
+# =============================================================================
+# docker-compose.yml: ambiente LOCAL da API de Reservas (API + PostgreSQL)
+# -----------------------------------------------------------------------------
+# Com este arquivo, o ambiente inteiro sobe com UM comando:
+#     docker compose up -d --build
+#
+# O Compose lê este arquivo e cria, na ordem certa:
+#   - as REDES por onde os containers conversam;
+#   - o VOLUME onde o banco guarda os dados (persistência);
+#   - os containers "db" (PostgreSQL) e "api" (Node.js/Express).
+#
+# CREDENCIAIS: nenhuma senha fica escrita aqui. Os valores ${...} são lidos do
+# arquivo .env, na raiz do projeto, que está no .gitignore e, por isso, nunca
+# vai para o GitHub. O modelo desse arquivo é o .env.example.
+#
+# A sintaxe ${VARIAVEL:?mensagem} faz o Compose PARAR com a mensagem de erro se
+# a variável não existir ou estiver vazia. É o mesmo "fail fast" do db.js: é
+# melhor não subir nada do que subir um banco com a senha vazia.
+#
+# Observação: a antiga linha "version:" no topo do arquivo está OBSOLETA no
+# Compose V2 (comando "docker compose", sem hífen) e foi omitida de propósito.
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Serviço 1: banco de dados PostgreSQL
+  # ---------------------------------------------------------------------------
+  db:
+    # Imagem OFICIAL do PostgreSQL, com versão fixa (17) e base Alpine (menor e
+    # com menos superfície de ataque). Não precisamos de um Dockerfile próprio
+    # para o banco: toda a configuração é feita por variáveis de ambiente.
+    #
+    # Por que a 17 e não a 18? A partir da imagem 18, o local dos dados mudou
+    # (de /var/lib/postgresql/data para /var/lib/postgresql). Com a 17, o
+    # caminho do volume abaixo é o clássico, que aparece na maioria das
+    # documentações e tutoriais.
+    image: postgres:17-alpine
+
+    # Se o container cair (erro, reinício do Docker), o Docker o sobe de novo.
+    # "unless-stopped": só NÃO reinicia se você o parou manualmente.
+    restart: unless-stopped
+
+    # Variáveis que a imagem oficial usa na PRIMEIRA inicialização, quando o
+    # volume ainda está vazio, para criar o usuário, a senha e o banco.
+    # ATENÇÃO: se o volume já tiver dados, mudar estes valores NÃO altera
+    # nada no banco existente. Esse comportamento é esperado.
+    #
+    # Os nomes no .env (DB_*) são os mesmos que a API usa. Assim, API e banco
+    # leem a MESMA fonte e não correm o risco de ficar com senhas diferentes.
+    environment:
+      POSTGRES_USER: ${DB_USER:?Defina DB_USER no arquivo .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo .env}
+      POSTGRES_DB: ${DB_NAME:?Defina DB_NAME no arquivo .env}
+
+    # PERSISTÊNCIA DOS DADOS (requisito do cliente):
+    # "dados-postgres" é um VOLUME NOMEADO, ou seja, um espaço de armazenamento
+    # gerenciado pelo Docker e SEPARADO do container. Mesmo com o container
+    # removido ("docker compose down"), o volume e os dados continuam lá. Na
+    # próxima subida, o Postgres encontra os dados e segue de onde parou.
+    #
+    # Os dados só são apagados com "docker compose down -v" (o -v remove os
+    # volumes). CUIDADO com esse comando.
+    volumes:
+      - dados-postgres:/var/lib/postgresql/data
+
+    # O banco fica SÓ na rede interna "backend". Repare que NÃO existe a
+    # seção "ports:" aqui: a porta 5432 não é publicada no seu computador.
+    # Somente a API, que também está nessa rede, consegue falar com o banco.
+    # Isso reduz a superfície de ataque: ninguém da sua rede Wi-Fi, por
+    # exemplo, consegue tentar logar no Postgres.
+    networks:
+      - backend
+
+    # HEALTHCHECK: um teste que o Docker roda periodicamente DENTRO do
+    # container para saber se o serviço está saudável (e não só "ligado").
+    # - pg_isready: utilitário do próprio Postgres que verifica se ele está
+    #   aceitando conexões.
+    # - "$$": escapa o "$" para o COMPOSE não substituir a variável. Assim ela
+    #   é lida pelo shell DENTRO do container, onde POSTGRES_USER existe.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s # roda o teste a cada 5 segundos
+      timeout: 5s # se o teste demorar mais que isso, conta como falha
+      retries: 10 # 10 falhas seguidas -> container marcado como "unhealthy"
+      start_period: 10s # tempo de "aquecimento": falhas aqui não contam
+
+    # Impede que processos dentro do container GANHEM novos privilégios (por
+    # exemplo, via programas com o bit "setuid"). É uma proteção extra contra
+    # escalada de privilégios caso algo dentro do container seja explorado.
+    security_opt:
+      - no-new-privileges:true
+
+  # ---------------------------------------------------------------------------
+  # Serviço 2: API de Reservas (Node.js/Express)
+  # ---------------------------------------------------------------------------
+  api:
+    # Em vez de baixar uma imagem pronta, o Compose CONSTRÓI a imagem usando o
+    # Dockerfile que está na pasta ./app (o "contexto de build").
+    build:
+      context: ./app
+
+    restart: unless-stopped
+
+    # A API só é iniciada depois que o banco estiver SAUDÁVEL (healthcheck
+    # acima passando), e não apenas "ligado". Sem o "condition", o Compose
+    # só esperaria o container do banco ser criado, e a API poderia tentar
+    # conectar antes de o Postgres estar pronto.
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # Variáveis lidas pelo db.js e pelo server.js.
+    # - DB_HOST: "db" é o NOME DO SERVIÇO acima. O Compose tem um DNS
+    #   interno: dentro da rede, o nome "db" aponta para o IP do container do
+    #   banco. Por isso não usamos "localhost" (dentro do container da API,
+    #   "localhost" é o PRÓPRIO container da API, não o banco).
+    # - DB_SSL fica ausente: no ambiente local, o tráfego não sai da sua
+    #   máquina (ver explicação no db.js).
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:?Defina DB_USER no arquivo .env}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo .env}
+      DB_NAME: ${DB_NAME:?Defina DB_NAME no arquivo .env}
+      PORT: 3000
+
+    # Publica a porta da API no seu computador, no formato
+    # "IP_DO_HOST:PORTA_DO_HOST:PORTA_DO_CONTAINER".
+    #
+    # SEGURANÇA: o "127.0.0.1" faz a API ficar acessível SÓ no seu próprio
+    # computador (http://localhost:3000). Sem ele, o Docker publicaria a porta
+    # em TODAS as interfaces de rede, e qualquer pessoa na mesma rede (ex.: o
+    # Wi-Fi da faculdade) conseguiria acessar a API. Detalhe importante: o
+    # Docker cria as próprias regras de firewall e, por isso, uma porta
+    # publicada pode ficar acessível MESMO com o firewalld bloqueando.
+    #
+    # ${API_PORTA:-3000}: usa a porta definida no .env ou, se não existir,
+    # 3000. Útil se a 3000 já estiver ocupada na sua máquina.
+    ports:
+      - "127.0.0.1:${API_PORTA:-3000}:3000"
+
+    # A API participa das DUAS redes:
+    # - backend: para conversar com o banco;
+    # - frontend: para ser alcançada pela porta publicada acima.
+    networks:
+      - backend
+      - frontend
+
+    # HEALTHCHECK usando a rota /health da própria API (requisito do cliente).
+    # - wget: já vem na imagem Alpine (via BusyBox), então não precisamos
+    #   instalar o curl só para isso, o que manteria a imagem maior.
+    # - "-q" (silencioso) e "-O /dev/null" (descarta o corpo da resposta):
+    #   só importa o CÓDIGO DE SAÍDA do wget. Ele é 0 (sucesso) se a API
+    #   respondeu com status 2xx, e diferente de 0 caso contrário.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      # A API pode levar alguns segundos para subir (ela espera a tabela ser
+      # criada), então damos um tempo de aquecimento maior.
+      start_period: 15s
+
+    # ENDURECIMENTO (hardening) do container da API:
+    # - read_only: o sistema de arquivos do container fica SOMENTE LEITURA.
+    #   A API não precisa gravar nada em disco (os dados vão para o banco).
+    #   Se um atacante explorar uma falha, não consegue gravar scripts ou
+    #   alterar arquivos dentro do container.
+    # - tmpfs /tmp: uma pasta temporária em MEMÓRIA, para o caso de alguma
+    #   biblioteca precisar gravar arquivos temporários. Ela é apagada
+    #   quando o container para.
+    # - cap_drop ALL: o Linux divide os poderes do root em "capabilities"
+    #   (ex.: alterar a rede, trocar dono de arquivos). A API já roda com o
+    #   usuário "node" (ver Dockerfile) e não precisa de NENHUMA delas, então
+    #   removemos todas. É o princípio do MENOR PRIVILÉGIO.
+    # - no-new-privileges: mesma proteção explicada no serviço "db".
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+# -----------------------------------------------------------------------------
+# Redes
+# -----------------------------------------------------------------------------
+# Separamos o tráfego em duas redes, como "salas" isoladas:
+# - backend (internal: true): rede INTERNA, sem saída para a internet e sem
+#   portas publicadas. Só a API e o banco estão nela. Mesmo que o container
+#   do banco fosse comprometido, ele não conseguiria "ligar para fora" (por
+#   exemplo, para enviar os dados a um servidor de um atacante).
+# - frontend: rede comum, usada para a porta da API ser publicada no host.
+networks:
+  backend:
+    internal: true
+  frontend:
+
+# -----------------------------------------------------------------------------
+# Volumes
+# -----------------------------------------------------------------------------
+# Declaração do volume nomeado usado pelo banco. O Docker o cria na primeira
+# subida. Os dados ficam em uma área gerenciada pelo próprio Docker, e você
+# pode vê-los com "docker volume ls" e "docker volume inspect".
+volumes:
+  dados-postgres:

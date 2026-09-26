@@ -1,0 +1,3 @@
+NAME                                   IMAGE                                COMMAND                  SERVICE   CREATED         STATUS                   PORTS
+prova-primeiro-bimestre-devops-api-1   prova-primeiro-bimestre-devops-api   "docker-entrypoint.s…"   api       3 minutes ago   Up 2 minutes (healthy)   127.0.0.1:3000->3000/tcp
+prova-primeiro-bimestre-devops-db-1    postgres:17-alpine                   "docker-entrypoint.s…"   db        3 minutes ago   Up 3 minutes (healthy)   5432/tcp
