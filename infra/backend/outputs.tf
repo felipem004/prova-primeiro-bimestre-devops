@@ -11,7 +11,7 @@
 
 output "nome_bucket" {
   description = "Nome do bucket S3 que guarda o state do projeto principal."
-  value       = aws_s3_bucket.state.id
+  value       = local.nome_bucket
 }
 
 output "nome_tabela_lock" {

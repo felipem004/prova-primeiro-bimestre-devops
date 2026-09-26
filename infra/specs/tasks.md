@@ -43,14 +43,21 @@
 
 ## Fase B: State remoto (`infra/backend/`)
 
-### [ ] T-04: Projeto `backend/`
-- **O quê:** `providers.tf`, `variables.tf`, `main.tf` e `outputs.tf` com o
-  bucket S3 (versionado, criptografado, bloqueio público, BucketOwnerEnforced)
-  e a tabela DynamoDB `api-reservas-tflock`.
-- **Atende:** RF-01 (CA-01.1, CA-01.4), CA-S.2, CA-Q.2 a CA-Q.4 · design §4
-- **Verificar:** `terraform fmt -check`, `terraform init`, `terraform
-  validate`, `terraform plan` (revisar) e `terraform apply`. Depois do apply,
-  os outputs mostram o nome do bucket e da tabela.
+### [x] T-04: Projeto `backend/`
+- **O quê:** `providers.tf`, `variables.tf`, `main.tf` e `outputs.tf` com as
+  configurações do bucket S3 (versionado, criptografado, bloqueio público,
+  BucketOwnerEnforced) e a tabela DynamoDB `api-reservas-tflock`. O bucket
+  em si é criado pelo `criar-bucket.sh` (ver o desvio registrado no design
+  §4).
+- **Atende:** RF-01 (CA-01.1 parcial, CA-01.4), CA-S.2, CA-Q.2 a CA-Q.4 ·
+  design §4
+- **Ordem:** (1) `bash criar-bucket.sh`; (2) `terraform fmt -check`,
+  `init`, `validate`, `plan` (revisar) e `apply`.
+- **Verificar:** depois do apply, os outputs mostram o nome do bucket e da
+  tabela, e `aws s3api get-bucket-versioning` retorna `Enabled`.
+- **Histórico:** a 1ª tentativa, com o recurso `aws_s3_bucket`, falhou por
+  causa da SCP do lab. O bucket criado nessa tentativa foi removido do state
+  com `terraform state rm` e reaproveitado.
 - **Commit sugerido:** `feat(infra): cria backend S3 + DynamoDB para o state remoto`
   (sem o `terraform.tfstate` local, que é ignorado).
 
@@ -133,9 +140,10 @@
 - **Atende:** CA-C.2
 - **Ordem obrigatória:**
   1. `terraform destroy` em `infra/` (EC2, RDS, rede).
-  2. Esvaziar o bucket do state, **incluindo todas as versões** (bucket
-     versionado), porque o `force_destroy` é `false`.
-  3. `terraform destroy` em `infra/backend/`.
+  2. `terraform destroy` em `infra/backend/` (tabela DynamoDB e
+     configurações do bucket; o bucket em si não é gerenciado pelo Terraform).
+  3. Esvaziar o bucket do state, **incluindo todas as versões** (bucket
+     versionado), e apagá-lo com o AWS CLI.
 - **Por que essa ordem:** se o backend for destruído primeiro, o state da
   infraestrutura principal se perde, e os recursos ficam "órfãos": continuam
   existindo (e consumindo créditos), mas o Terraform não sabe mais que eles

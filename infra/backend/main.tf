@@ -26,26 +26,27 @@ locals {
 }
 
 # -----------------------------------------------------------------------------
-# 1. Bucket S3 do state
+# 1. Configurações do bucket S3 do state
 # -----------------------------------------------------------------------------
-# Desde a versão 4 do provider, o bucket e cada configuração dele (versões,
-# criptografia, bloqueio público...) são recursos SEPARADOS. Isso deixa cada
-# aspecto explícito e fácil de revisar no "plan".
-resource "aws_s3_bucket" "state" {
-  bucket = local.nome_bucket
-
-  # force_destroy = false (padrão seguro): o Terraform se RECUSA a apagar o
-  # bucket enquanto houver objetos nele. Evita apagar o state por acidente
-  # num "terraform destroy". Na limpeza final (T-13), o bucket é esvaziado
-  # de forma explícita, antes do destroy.
-  force_destroy = false
-}
+# O BUCKET EM SI NÃO É CRIADO AQUI, e sim pelo script criar-bucket.sh.
+#
+# Motivo: o recurso "aws_s3_bucket" do provider, logo depois de criar o
+# bucket, lê TODAS as configurações dele para gravar no state, inclusive o
+# Object Lock (s3:GetBucketObjectLockConfiguration). No Learner Lab, essa
+# leitura é negada por uma SCP (Service Control Policy) da organização do
+# AWS Academy, e o recurso sempre falha. Ver o desvio registrado no
+# design.md, §4.
+#
+# Desde a versão 4 do provider, cada configuração do bucket (versões,
+# criptografia, bloqueio público...) é um recurso SEPARADO. Isso permite
+# gerenciá-las no Terraform mesmo sem o recurso do bucket: basta informar o
+# NOME do bucket (local.nome_bucket), que já existe na AWS.
 
 # Versionamento: cada vez que o state é gravado, o S3 guarda uma NOVA versão
 # e mantém as anteriores. Se um state for corrompido ou sobrescrito por
 # engano, dá para voltar a uma versão antiga.
 resource "aws_s3_bucket_versioning" "state" {
-  bucket = aws_s3_bucket.state.id
+  bucket = local.nome_bucket
 
   versioning_configuration {
     status = "Enabled"
@@ -56,7 +57,7 @@ resource "aws_s3_bucket_versioning" "state" {
 # disco da AWS. AES256 = SSE-S3, com chaves gerenciadas pela própria AWS, sem
 # custo extra (a alternativa, SSE-KMS, cobra por chave e por requisição).
 resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
-  bucket = aws_s3_bucket.state.id
+  bucket = local.nome_bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -73,7 +74,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
 # deixa a proteção DOCUMENTADA no código, e o Terraform a restaura se alguém
 # a desligar pelo console.
 resource "aws_s3_bucket_public_access_block" "state" {
-  bucket = aws_s3_bucket.state.id
+  bucket = local.nome_bucket
 
   block_public_acls       = true # rejeita novas ACLs públicas
   ignore_public_acls      = true # ignora ACLs públicas que já existam
@@ -85,7 +86,7 @@ resource "aws_s3_bucket_public_access_block" "state" {
 # antigo de permissões, por objeto). Assim o acesso é controlado só por
 # políticas IAM/de bucket, em um único lugar, o que é mais fácil de auditar.
 resource "aws_s3_bucket_ownership_controls" "state" {
-  bucket = aws_s3_bucket.state.id
+  bucket = local.nome_bucket
 
   rule {
     object_ownership = "BucketOwnerEnforced"

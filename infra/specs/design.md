@@ -80,19 +80,38 @@ Arquivos **locais, fora do Git** (já cobertos pelo `.gitignore`, exceto o
 primeiro, com state **local** (`infra/backend/terraform.tfstate`, que é
 ignorado pelo Git e **não pode ser perdido**).
 
+> **Revisão (26/09/2026): desvio do design original.** No primeiro `apply`,
+> o recurso `aws_s3_bucket` criou o bucket, mas falhou logo em seguida: o
+> provider sempre lê a configuração de Object Lock
+> (`s3:GetBucketObjectLockConfiguration`), e essa leitura é **negada por uma
+> SCP** da organização do AWS Academy, que nenhuma permissão da conta
+> consegue contornar. Por isso:
+>
+> - O **bucket** é criado **fora do Terraform**, pelo script
+>   `infra/backend/criar-bucket.sh` (AWS CLI), que fica versionado e é
+>   idempotente (não faz nada se o bucket já existir).
+> - As **configurações** do bucket (versionamento, criptografia, bloqueio
+>   público e ownership) e a **tabela DynamoDB** continuam no Terraform. Elas
+>   referenciam o bucket **pelo nome**, sem o recurso `aws_s3_bucket`.
+> - Consequência: a exigência "S3 + DynamoDB via Terraform" (CA-01.1) fica
+>   atendida **parcialmente**, com justificativa registrada no relatório. O
+>   `terraform destroy` não apaga o bucket; isso vira um passo manual na T-13.
+
 | Recurso | Configuração | Requisito |
 |---------|--------------|-----------|
-| `aws_s3_bucket` | Nome `api-reservas-tfstate-<account_id>`, obtido com `data "aws_caller_identity"`. Nomes de bucket são **globais** na AWS, e o ID da conta garante que o nome seja único. | CA-01.1 |
+| Bucket (via `criar-bucket.sh`) | Nome `api-reservas-tfstate-<account_id>`. Nomes de bucket são **globais** na AWS, e o ID da conta garante que o nome seja único. No Terraform, o mesmo nome é montado com `data "aws_caller_identity"`. | CA-01.1 (parcial) |
 | `aws_s3_bucket_versioning` | `Enabled`: cada escrita do state gera uma versão, e dá para recuperar um state corrompido. | CA-S.2 |
 | `aws_s3_bucket_server_side_encryption_configuration` | `AES256` (SSE-S3): criptografia gerenciada pela AWS, sem custo extra de KMS. | CA-S.2 |
 | `aws_s3_bucket_public_access_block` | Os 4 bloqueios em `true`. | CA-S.2 |
 | `aws_s3_bucket_ownership_controls` | `BucketOwnerEnforced`: desativa ACLs e deixa o acesso controlado só por políticas. | CA-S.2 |
 | `aws_dynamodb_table` | Nome `api-reservas-tflock`, `billing_mode = "PAY_PER_REQUEST"` (paga só pelo uso, que é quase zero), chave `LockID` do tipo `S`. O nome e o tipo da chave são **exigidos** pelo backend S3. | CA-01.1, CA-01.3 |
 
-**Destruição (CA-C.2):** o bucket é versionado, e um bucket com objetos não
-pode ser apagado. Decisão: `force_destroy = false` (padrão seguro, que evita
-apagar o state por acidente). Na limpeza final, o bucket é esvaziado de forma
-explícita. O procedimento completo fica documentado no `tasks.md`.
+**Destruição (CA-C.2):** como o bucket não é gerenciado pelo Terraform, o
+`terraform destroy` do `backend/` apaga só a tabela e as configurações. O
+bucket (versionado, com todas as versões do state) é esvaziado e apagado
+manualmente com o AWS CLI, **por último**. Isso também elimina o risco de um
+`destroy` apagar o state por acidente. O procedimento completo fica
+documentado no `tasks.md`.
 
 ## 5. Configuração do backend e do provider (`infra/providers.tf`)
 
