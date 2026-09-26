@@ -23,7 +23,7 @@
 - **Verificar:** `git check-ignore -v infra/backend.hcl aws-credentials.sh`
   aponta as regras novas.
 
-### [ ] T-02: Credenciais do Learner Lab na máquina local
+### [x] T-02: Credenciais do Learner Lab na máquina local
 - **O quê (manual, pelo desenvolvedor):** as credenciais de "AWS Details →
   AWS CLI" ficam como **variáveis de ambiente** (`AWS_ACCESS_KEY_ID`,
   `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`) no arquivo
@@ -35,7 +35,7 @@
 - **Verificar:** `aws sts get-caller-identity` responde sem erro de
   autenticação.
 
-### [ ] T-03: Descobrir o IP público do desenvolvedor
+### [x] T-03: Descobrir o IP público do desenvolvedor
 - **O quê:** obter o seu IP público, que vira `cidr_ssh = "<ip>/32"`.
 - **Atende:** CA-03.1
 - **Atenção:** em redes domésticas, o IP pode mudar. Se o SSH parar de
