@@ -16,3 +16,7 @@ node_modules/
 *.pem
 
 # Credenciais da AWS.
+
+
+# Hist´orico de prompts - temporário
+historico_de_prompts.md
