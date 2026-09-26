@@ -1,0 +1,23 @@
+# =============================================================================
+# backend.hcl.example: MODELO da configuração do backend S3
+# -----------------------------------------------------------------------------
+# Este arquivo VAI para o Git. O arquivo real, backend.hcl, é ignorado pelo
+# Git porque o nome do bucket contém o ID da conta AWS.
+#
+# Como usar:
+#   1. Crie o backend.hcl a partir deste modelo, trocando <NOME_DO_BUCKET>
+#      pelo output "nome_bucket" do projeto infra/backend/.
+#   2. Inicialize o projeto principal com:
+#          terraform init -backend-config=backend.hcl
+#
+# Estes valores completam o bloco backend "s3" do providers.tf.
+# =============================================================================
+
+# Bucket criado na Fase B (infra/backend/criar-bucket.sh).
+bucket = "<NOME_DO_BUCKET>"
+
+# Tabela de lock criada na Fase B (infra/backend/main.tf).
+dynamodb_table = "api-reservas-tflock"
+
+# Região do bucket e da tabela.
+region = "us-east-1"

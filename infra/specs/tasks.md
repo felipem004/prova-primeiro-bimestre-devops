@@ -63,7 +63,7 @@
 
 ## Fase C: Projeto principal (`infra/`)
 
-### [ ] T-05: `providers.tf` e `backend.hcl.example`
+### [x] T-05: `providers.tf` e `backend.hcl.example`
 - **O quê:** versões fixadas, provider AWS com `default_tags` e backend `s3`
   parcial. Criar o `backend.hcl.example` (modelo) e, **manualmente**, o
   `backend.hcl` local com o nome real do bucket.

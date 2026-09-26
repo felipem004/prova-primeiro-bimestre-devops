@@ -143,6 +143,10 @@ desde o Terraform 1.11 (Q-04). Na 1.16.4 ele deve gerar apenas um **aviso**
 de obsolescência no `init`. Se gerar **erro**, a alternativa é voltar à Q-04
 e decidir de novo com você.
 
+> **Verificado (26/09/2026, T-05):** na 1.16.4, o `dynamodb_table` gera só o
+> aviso `Deprecated Parameter` ("Use parameter use_lockfile instead") e
+> continua funcionando. A Q-04 se mantém.
+
 **Provider:**
 - Credenciais: **não** aparecem no código. O provider usa a cadeia padrão da
   AWS, que começa pelas **variáveis de ambiente** (`AWS_ACCESS_KEY_ID`,
