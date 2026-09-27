@@ -97,7 +97,7 @@
 - **Verificar:** no `terraform plan`, `publicly_accessible = false`,
   `storage_encrypted = true` e a senha aparece como `(sensitive value)`.
 
-### [ ] T-09: Módulo `ec2` + `user_data.sh.tftpl`
+### [x] T-09: Módulo `ec2` + `user_data.sh.tftpl`
 - **O quê:** AMI Amazon Linux 2023, instância com IMDSv2 (hop limit 1), disco
   criptografado, chave `vockey` e o script de inicialização.
 - **Atende:** RF-04 (CA-04.1 a 04.4), CA-S.1 · design §6.4

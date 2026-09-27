@@ -26,6 +26,22 @@ variable "cidr_http" {
   default     = "0.0.0.0/0"
 }
 
+variable "url_repositorio" {
+  description = "URL HTTPS do repositório público clonado pela EC2 (precisa conter a pasta app/)."
+  type        = string
+  # O repositório é público, então a URL não é um dado sensível e pode ficar
+  # como valor padrão, versionado.
+  default = "https://github.com/felipem004/prova-primeiro-bimestre-devops.git"
+
+  # Só HTTPS: o git clone por "git@..." (SSH) exigiria uma chave na EC2, e
+  # "http://" não é criptografado (o código poderia ser adulterado no
+  # caminho).
+  validation {
+    condition     = startswith(var.url_repositorio, "https://")
+    error_message = "url_repositorio precisa começar com https://."
+  }
+}
+
 variable "db_senha" {
   description = "Senha do usuário principal do RDS. Mínimo de 16 caracteres; sem /, @, aspas duplas ou espaços."
   type        = string

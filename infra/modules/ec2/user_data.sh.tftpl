@@ -1,0 +1,112 @@
+#!/bin/bash
+# =============================================================================
+# user_data.sh.tftpl: script de inicialização da EC2 (roda UMA vez, no 1º boot)
+# -----------------------------------------------------------------------------
+# Atende: CA-04.2, CA-04.3, CA-04.4 · design §6.4
+#
+# Este arquivo é um TEMPLATE do Terraform (.tftpl): antes de ser enviado à
+# AWS, o templatefile() troca cada marcador de substituição (um cifrão
+# seguido de chaves, como os da seção 4) pelo valor correspondente: URL do
+# repositório, dados do banco etc.
+#
+# ATENÇÃO ao editar: para o Terraform, TODO "cifrão seguido de abre-chaves"
+# é uma substituição dele, ATÉ DENTRO DE COMENTÁRIOS. Por isso:
+#   - as variáveis do BASH neste script são escritas SEM chaves (ex.: $PASTA);
+#   - para escrever essa sequência literalmente, é preciso dobrar o cifrão.
+#
+# O script roda como root, pelo cloud-init. A saída dele fica em
+# /var/log/cloud-init-output.log (útil para depurar via SSH).
+# =============================================================================
+
+# Modo estrito: para no primeiro erro (-e), trata variável indefinida como
+# erro (-u) e considera erros no meio de um pipe (-o pipefail).
+set -euo pipefail
+
+PASTA=/opt/api-reservas
+
+# -----------------------------------------------------------------------------
+# 1. Docker e Git
+# -----------------------------------------------------------------------------
+# O Amazon Linux 2023 usa o dnf (o mesmo gerenciador de pacotes do Fedora).
+dnf install -y docker git
+
+# "enable" faz o Docker iniciar sozinho a CADA boot; "--now" também o inicia
+# agora. É isso que, junto com o --restart do container, faz a API voltar
+# sozinha quando o lab religar a EC2 (CA-04.3).
+systemctl enable --now docker
+
+# -----------------------------------------------------------------------------
+# 2. Certificado da CA do RDS (para o SSL com verificação, CA-04.4)
+# -----------------------------------------------------------------------------
+# O certificado do RDS é assinado por uma autoridade (CA) da própria AWS, que
+# o Node não conhece. Baixamos o pacote oficial de CAs do RDS para que a API
+# possa VERIFICAR que está falando com o banco verdadeiro
+# (rejectUnauthorized: true, no db.js).
+#   -f: falha em erros HTTP (404, 500...) em vez de salvar a página de erro
+#   -sS: silencioso, mas mostra erros
+#   -L: segue redirecionamentos
+mkdir -p "$PASTA/certs"
+curl -fsSL -o "$PASTA/certs/global-bundle.pem" \
+  https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+
+# Um certificado de CA é PÚBLICO (não é segredo). Permissão 644: o usuário
+# "node", dentro do container, precisa conseguir lê-lo.
+chmod 644 "$PASTA/certs/global-bundle.pem"
+
+# -----------------------------------------------------------------------------
+# 3. Código da aplicação e build da imagem
+# -----------------------------------------------------------------------------
+# --depth 1: baixa só o último commit, sem o histórico inteiro (mais rápido).
+# --branch: a branch definida na variável do Terraform.
+git clone --depth 1 --branch "${branch}" "${url_repositorio}" "$PASTA/codigo"
+
+# Build com o MESMO Dockerfile do ambiente local (app/Dockerfile).
+docker build -t api-reservas:latest "$PASTA/codigo/app"
+
+# -----------------------------------------------------------------------------
+# 4. Variáveis de ambiente da API (contém a SENHA do banco)
+# -----------------------------------------------------------------------------
+# "install -m 600 /dev/null ARQUIVO" cria o arquivo VAZIO já com permissão
+# 600 (só o root lê e escreve). Criar primeiro e escrever depois evita uma
+# janela de tempo em que o arquivo existiria com permissões abertas.
+install -m 600 /dev/null "$PASTA/api.env"
+
+# O heredoc com 'FIM' entre aspas simples impede o bash de interpretar $, `
+# e \ no conteúdo. Assim, a senha é gravada exatamente como veio, mesmo que
+# tenha caracteres especiais. Os valores já foram preenchidos pelo Terraform.
+#
+# DB_SSL=true + DB_SSL_CA: conexão com o RDS criptografada e com o
+# certificado verificado (ver configurarSsl() no db.js).
+cat > "$PASTA/api.env" <<'FIM'
+DB_HOST=${db_host}
+DB_PORT=${db_porta}
+DB_NAME=${db_nome}
+DB_USER=${db_usuario}
+DB_PASSWORD=${db_senha}
+DB_SSL=true
+DB_SSL_CA=/certs/global-bundle.pem
+PORT=3000
+FIM
+
+# -----------------------------------------------------------------------------
+# 5. Container da API
+# -----------------------------------------------------------------------------
+# Mesmas proteções do docker-compose.yml local:
+#   --restart unless-stopped      -> volta sozinho após reboot/falha (CA-04.3)
+#   -p 80:3000                    -> porta 80 da EC2 -> porta 3000 do container
+#   --env-file                    -> variáveis do passo 4
+#   -v ...:/certs:ro              -> certificado montado como SOMENTE LEITURA
+#   --read-only + --tmpfs /tmp    -> sistema de arquivos somente leitura
+#   --cap-drop ALL                -> nenhuma capability do Linux
+#   --security-opt no-new-privileges -> impede escalada de privilégios
+docker run -d \
+  --name api-reservas \
+  --restart unless-stopped \
+  -p 80:3000 \
+  --env-file "$PASTA/api.env" \
+  -v "$PASTA/certs:/certs:ro" \
+  --read-only \
+  --tmpfs /tmp \
+  --cap-drop ALL \
+  --security-opt no-new-privileges:true \
+  api-reservas:latest

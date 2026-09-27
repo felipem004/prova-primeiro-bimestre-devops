@@ -63,3 +63,25 @@ module "rds" {
   usuario               = local.db_usuario
   senha                 = var.db_senha
 }
+
+# -----------------------------------------------------------------------------
+# Servidor da API (T-09)
+# -----------------------------------------------------------------------------
+# Depende de TODOS os outros módulos: sub-rede (vpc), firewall
+# (security-group) e o endereço do banco (rds). Por usar module.rds.endereco,
+# a EC2 só é criada DEPOIS que o RDS estiver pronto (o que leva alguns
+# minutos), e a API já encontra o banco disponível no primeiro boot.
+module "ec2" {
+  source = "./modules/ec2"
+
+  nome               = local.nome_projeto
+  id_subrede_publica = module.vpc.id_subrede_publica
+  id_sg_ec2          = module.security_group.id_sg_ec2
+  url_repositorio    = var.url_repositorio
+
+  db_host    = module.rds.endereco
+  db_porta   = module.rds.porta
+  db_nome    = local.db_nome
+  db_usuario = local.db_usuario
+  db_senha   = var.db_senha
+}
