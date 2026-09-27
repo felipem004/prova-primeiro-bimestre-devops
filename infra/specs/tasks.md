@@ -121,24 +121,30 @@
 - **Verificar:** **revisão manual** do arquivo antes do commit. Procurar a
   senha, o ID da conta e as credenciais da AWS; nada disso pode aparecer.
 
-### [ ] T-12: `terraform apply` e testes de aceite
+### [x] T-12: `terraform apply` e testes de aceite
 - **Atende:** validação final de todos os requisitos.
 - **Verificar (checklist):**
-  - [ ] `curl http://<ip>/health` → `200` (CA-04.2). Aguardar ~3 a 5 min
+  - [x] `curl http://<ip>/health` → `200` (CA-04.2). Aguardar ~3 a 5 min
         após o apply, pelo tempo do `user_data`.
-  - [ ] CRUD completo via `curl` (POST, GET, PUT, DELETE).
-  - [ ] SSH com `labsuser.pem` funciona a partir do seu IP (Q-02).
-  - [ ] Conexão direta do seu computador ao endpoint do RDS na 5432 **falha**
+  - [x] CRUD completo via `curl` (POST, GET, PUT, DELETE). O DELETE foi
+        feito por último, depois do teste de persistência.
+  - [x] SSH com `labsuser.pem` funciona a partir do seu IP (Q-02). Exigiu
+        `-o IdentitiesOnly=yes`, porque o ssh-agent local oferecia outra
+        chave antes; o fingerprint do host foi conferido pelo console da EC2.
+  - [x] Conexão direta do seu computador ao endpoint do RDS na 5432 **falha**
         (CA-05.2, CA-S.4).
-  - [ ] Parar e ligar a EC2 → a API volta sozinha e os dados continuam lá
-        (CA-04.3). Atenção: o **IP público muda** ao religar.
-  - [ ] Duas execuções simultâneas de `terraform plan` → a segunda é
-        bloqueada pelo lock (CA-01.3).
-  - [ ] Nenhum arquivo `terraform.tfstate` local em `infra/` (CA-01.2).
+  - [x] Parar e ligar a EC2 → a API volta sozinha e os dados continuam lá
+        (CA-04.3). Atenção: o **IP público muda** ao religar. Comprovado com
+        o reinício da sessão do Learner Lab.
+  - [x] Duas execuções simultâneas de `terraform plan` → a segunda é
+        bloqueada pelo lock (CA-01.3). Observado na T-08, quando um lock
+        órfão bloqueou o plan (liberado com `terraform force-unlock`), e
+        repetido de propósito com dois terminais.
+  - [x] Nenhum arquivo `terraform.tfstate` local em `infra/` (CA-01.2).
 
 ## Fase E: Encerramento
 
-### [ ] T-13: Procedimento de destruição (documentar e, ao final, executar)
+### [x] T-13: Procedimento de destruição (documentar e, ao final, executar)
 - **Atende:** CA-C.2
 - **Ordem obrigatória:**
   1. `terraform destroy` em `infra/` (EC2, RDS, rede).
