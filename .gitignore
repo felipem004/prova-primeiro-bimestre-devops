@@ -1,12 +1,12 @@
-# Arquivos para instrução e contexto da IA.
-contextoDoProjeto.md
-
 # Terraform.
 *.tfstate*
 *.tfvars
 *.tfplan
 backend.hcl
 .terraform/
+*.tfvars.json
+.terraformrc
+terraform.rc
 
 # Node.
 node_modules/
@@ -16,9 +16,17 @@ node_modules/
 .env.*
 !.env.example
 *.pem
+*.ppk
+
+# Terraform: sobrescritas locais
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Crashes
+crash.log
+crash.*.log
 
 # Credenciais da AWS.
 aws-credentials.sh
-
-# Histórico de prompts - temporário
-historico_de_prompts.md
