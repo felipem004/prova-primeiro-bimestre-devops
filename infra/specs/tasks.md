@@ -105,7 +105,7 @@
   `http_put_response_hop_limit = 1`, e o `user_data` **não** aparece em texto
   puro.
 
-### [ ] T-10: Variáveis e saídas da raiz + `terraform.tfvars.example`
+### [x] T-10: Variáveis e saídas da raiz + `terraform.tfvars.example`
 - **O quê:** `variables.tf` (com a validação da senha), `outputs.tf` e o
   modelo `terraform.tfvars.example`. Criar o `terraform.tfvars` local
   **manualmente**, com a senha gerada pelo desenvolvedor.
