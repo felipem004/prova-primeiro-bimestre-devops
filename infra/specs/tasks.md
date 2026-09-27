@@ -115,7 +115,7 @@
 
 ## Fase D: Evidência, aplicação e testes
 
-### [ ] T-11: Plan como evidência
+### [x] T-11: Plan como evidência
 - **O quê:** salvar a saída do plan em `evidencias/terraform-plan.txt`.
 - **Atende:** CA-06.3
 - **Verificar:** **revisão manual** do arquivo antes do commit. Procurar a

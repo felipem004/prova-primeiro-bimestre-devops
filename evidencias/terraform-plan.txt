@@ -1,0 +1,543 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.ec2.aws_instance.api will be created
+  + resource "aws_instance" "api" {
+      + ami                                  = "ami-0b2c9d1f3edcfd709"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + force_destroy                        = false
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "t3.micro"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "vockey"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_group_id                   = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + region                               = "us-east-1"
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = (known after apply)
+      + tags                                 = {
+          + "Name" = "api-reservas-api"
+        }
+      + tags_all                             = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-api"
+          + "Projeto"       = "api-reservas"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (sensitive value)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = true
+      + vpc_security_group_ids               = (known after apply)
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options {
+          + http_endpoint               = "enabled"
+          + http_protocol_ipv6          = "disabled"
+          + http_put_response_hop_limit = 1
+          + http_tokens                 = "required"
+          + instance_metadata_tags      = (known after apply)
+        }
+
+      + network_interface (known after apply)
+
+      + primary_network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = true
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = (known after apply)
+          + volume_type           = "gp3"
+        }
+
+      + secondary_network_interface (known after apply)
+    }
+
+  # module.rds.aws_db_instance.principal will be created
+  + resource "aws_db_instance" "principal" {
+      + address                               = (known after apply)
+      + allocated_storage                     = 20
+      + apply_immediately                     = true
+      + arn                                   = (known after apply)
+      + auto_minor_version_upgrade            = true
+      + availability_zone                     = (known after apply)
+      + backup_retention_period               = 1
+      + backup_target                         = (known after apply)
+      + backup_window                         = (known after apply)
+      + ca_cert_identifier                    = (known after apply)
+      + character_set_name                    = (known after apply)
+      + copy_tags_to_snapshot                 = false
+      + database_insights_mode                = (known after apply)
+      + db_name                               = "reservas"
+      + db_subnet_group_name                  = "api-reservas-db-subnets"
+      + dedicated_log_volume                  = false
+      + delete_automated_backups              = true
+      + deletion_protection                   = false
+      + domain_fqdn                           = (known after apply)
+      + endpoint                              = (known after apply)
+      + engine                                = "postgres"
+      + engine_lifecycle_support              = (known after apply)
+      + engine_version                        = "17"
+      + engine_version_actual                 = (known after apply)
+      + hosted_zone_id                        = (known after apply)
+      + id                                    = (known after apply)
+      + identifier                            = "api-reservas-db"
+      + identifier_prefix                     = (known after apply)
+      + instance_class                        = "db.t3.micro"
+      + iops                                  = (known after apply)
+      + kms_key_id                            = (known after apply)
+      + latest_restorable_time                = (known after apply)
+      + license_model                         = (known after apply)
+      + listener_endpoint                     = (known after apply)
+      + maintenance_window                    = (known after apply)
+      + master_user_secret                    = (known after apply)
+      + master_user_secret_kms_key_id         = (known after apply)
+      + monitoring_interval                   = 0
+      + monitoring_role_arn                   = (known after apply)
+      + multi_az                              = false
+      + nchar_character_set_name              = (known after apply)
+      + network_type                          = (known after apply)
+      + option_group_name                     = (known after apply)
+      + parameter_group_name                  = (known after apply)
+      + password                              = (sensitive value)
+      + password_wo                           = (write-only attribute)
+      + performance_insights_enabled          = false
+      + performance_insights_kms_key_id       = (known after apply)
+      + performance_insights_retention_period = (known after apply)
+      + port                                  = (known after apply)
+      + publicly_accessible                   = false
+      + region                                = "us-east-1"
+      + replica_mode                          = (known after apply)
+      + replicas                              = (known after apply)
+      + resource_id                           = (known after apply)
+      + skip_final_snapshot                   = true
+      + snapshot_identifier                   = (known after apply)
+      + status                                = (known after apply)
+      + storage_encrypted                     = true
+      + storage_throughput                    = (known after apply)
+      + storage_type                          = "gp3"
+      + tags                                  = {
+          + "Name" = "api-reservas-db"
+        }
+      + tags_all                              = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-db"
+          + "Projeto"       = "api-reservas"
+        }
+      + timezone                              = (known after apply)
+      + upgrade_rollout_order                 = (known after apply)
+      + username                              = "reservas_app"
+      + vpc_security_group_ids                = (known after apply)
+    }
+
+  # module.rds.aws_db_subnet_group.principal will be created
+  + resource "aws_db_subnet_group" "principal" {
+      + arn                     = (known after apply)
+      + description             = "Managed by Terraform"
+      + id                      = (known after apply)
+      + name                    = "api-reservas-db-subnets"
+      + name_prefix             = (known after apply)
+      + region                  = "us-east-1"
+      + subnet_ids              = (known after apply)
+      + supported_network_types = (known after apply)
+      + tags                    = {
+          + "Name" = "api-reservas-db-subnets"
+        }
+      + tags_all                = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-db-subnets"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id                  = (known after apply)
+    }
+
+  # module.security_group.aws_security_group.ec2 will be created
+  + resource "aws_security_group" "ec2" {
+      + arn                    = (known after apply)
+      + description            = "API de Reservas: HTTP publico e SSH restrito"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "api-reservas-sg-ec2"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + region                 = "us-east-1"
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "api-reservas-sg-ec2"
+        }
+      + tags_all               = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-sg-ec2"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.security_group.aws_security_group.rds will be created
+  + resource "aws_security_group" "rds" {
+      + arn                    = (known after apply)
+      + description            = "PostgreSQL: acesso somente a partir da EC2 da API"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "api-reservas-sg-rds"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + region                 = "us-east-1"
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "api-reservas-sg-rds"
+        }
+      + tags_all               = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-sg-rds"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.security_group.aws_vpc_security_group_egress_rule.ec2_saida will be created
+  + resource "aws_vpc_security_group_egress_rule" "ec2_saida" {
+      + arn                    = (known after apply)
+      + cidr_ipv4              = "0.0.0.0/0"
+      + description            = "Saida liberada (pacotes, git, Docker, RDS)"
+      + id                     = (known after apply)
+      + ip_protocol            = "-1"
+      + region                 = "us-east-1"
+      + security_group_id      = (known after apply)
+      + security_group_rule_id = (known after apply)
+      + tags_all               = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Projeto"       = "api-reservas"
+        }
+    }
+
+  # module.security_group.aws_vpc_security_group_ingress_rule.ec2_http will be created
+  + resource "aws_vpc_security_group_ingress_rule" "ec2_http" {
+      + arn                    = (known after apply)
+      + cidr_ipv4              = "0.0.0.0/0"
+      + description            = "HTTP da API"
+      + from_port              = 80
+      + id                     = (known after apply)
+      + ip_protocol            = "tcp"
+      + region                 = "us-east-1"
+      + security_group_id      = (known after apply)
+      + security_group_rule_id = (known after apply)
+      + tags_all               = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Projeto"       = "api-reservas"
+        }
+      + to_port                = 80
+    }
+
+  # module.security_group.aws_vpc_security_group_ingress_rule.ec2_ssh will be created
+  + resource "aws_vpc_security_group_ingress_rule" "ec2_ssh" {
+      + arn                    = (known after apply)
+      + cidr_ipv4              = "<SEU_IP>/32"
+      + description            = "SSH somente do IP do administrador"
+      + from_port              = 22
+      + id                     = (known after apply)
+      + ip_protocol            = "tcp"
+      + region                 = "us-east-1"
+      + security_group_id      = (known after apply)
+      + security_group_rule_id = (known after apply)
+      + tags_all               = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Projeto"       = "api-reservas"
+        }
+      + to_port                = 22
+    }
+
+  # module.security_group.aws_vpc_security_group_ingress_rule.rds_postgres will be created
+  + resource "aws_vpc_security_group_ingress_rule" "rds_postgres" {
+      + arn                          = (known after apply)
+      + description                  = "PostgreSQL somente a partir do SG da EC2"
+      + from_port                    = 5432
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = (known after apply)
+      + region                       = "us-east-1"
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Projeto"       = "api-reservas"
+        }
+      + to_port                      = 5432
+    }
+
+  # module.vpc.aws_internet_gateway.principal will be created
+  + resource "aws_internet_gateway" "principal" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + region   = "us-east-1"
+      + tags     = {
+          + "Name" = "api-reservas-igw"
+        }
+      + tags_all = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-igw"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.vpc.aws_route_table.privada will be created
+  + resource "aws_route_table" "privada" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + region           = "us-east-1"
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "api-reservas-rt-privada"
+        }
+      + tags_all         = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-rt-privada"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table.publica will be created
+  + resource "aws_route_table" "publica" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + region           = "us-east-1"
+      + route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + gateway_id                 = (known after apply)
+                # (12 unchanged attributes hidden)
+            },
+        ]
+      + tags             = {
+          + "Name" = "api-reservas-rt-publica"
+        }
+      + tags_all         = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-rt-publica"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.privada[0] will be created
+  + resource "aws_route_table_association" "privada" {
+      + id             = (known after apply)
+      + region         = "us-east-1"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.privada[1] will be created
+  + resource "aws_route_table_association" "privada" {
+      + id             = (known after apply)
+      + region         = "us-east-1"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_route_table_association.publica will be created
+  + resource "aws_route_table_association" "publica" {
+      + id             = (known after apply)
+      + region         = "us-east-1"
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.privada[0] will be created
+  + resource "aws_subnet" "privada" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.0.11.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "us-east-1"
+      + tags                                           = {
+          + "Name" = "api-reservas-subrede-privada-1"
+        }
+      + tags_all                                       = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-subrede-privada-1"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.privada[1] will be created
+  + resource "aws_subnet" "privada" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.0.12.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "us-east-1"
+      + tags                                           = {
+          + "Name" = "api-reservas-subrede-privada-2"
+        }
+      + tags_all                                       = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-subrede-privada-2"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_subnet.publica will be created
+  + resource "aws_subnet" "publica" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.0.1.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block                                = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = true
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + region                                         = "us-east-1"
+      + tags                                           = {
+          + "Name" = "api-reservas-subrede-publica"
+        }
+      + tags_all                                       = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-subrede-publica"
+          + "Projeto"       = "api-reservas"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc.aws_vpc.principal will be created
+  + resource "aws_vpc" "principal" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.0.0.0/16"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + region                               = "us-east-1"
+      + tags                                 = {
+          + "Name" = "api-reservas-vpc"
+        }
+      + tags_all                             = {
+          + "Ambiente"      = "lab"
+          + "GerenciadoPor" = "terraform"
+          + "Name"          = "api-reservas-vpc"
+          + "Projeto"       = "api-reservas"
+        }
+    }
+
+Plan: 19 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + comando_ssh    = (known after apply)
+  + endpoint_rds   = (known after apply)
+  + ip_publico_ec2 = (known after apply)
+  + url_api        = (known after apply)
